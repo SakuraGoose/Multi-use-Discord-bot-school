@@ -1,5 +1,5 @@
 on: push
-name: 🚀 Deploy website on push
+name: Deploy on push
 jobs:
   web-deploy:
     name: 🎉 Deploy
@@ -14,8 +14,3 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        exclude: |
-            **/.env*
-            **/.git*/**
-            **/logs/**
-            notes.txt
