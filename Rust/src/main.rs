@@ -21,6 +21,7 @@ impl EventHandler for Handler {
                 "wonderful_command" => Some(commands::wonderful_command::run(&command.data.options())),
                 // "id" => Some(commands::id::run(&command.data.options())),
                 // "attachmentinput" => Some(commands::attachmentinput::run(&command.data.options())),
+                "welcome" => Some(commands::welcome::run(&command.data.options).await),
                 "modal" => {
                     commands::modal::run(&ctx, &command).await.unwrap();
                     None
@@ -52,22 +53,30 @@ impl EventHandler for Handler {
             .set_commands(&ctx.http, vec![
                 // commands::ping::register(),
                 // commands::id::register(),
-                // commands::welcome::register(),
+                commands::welcome::register(),
                 // commands::numberinput::register(),
                 // commands::attachmentinput::register(),
-                // commands::modal::register(),
-                // commands::wonderful_command::register(),
+                commands::modal::register(),
             ])
             .await;
 
         println!("I now have the following guild slash commands: {commands:#?}");
-
-        let global_command =
-            Command::create_global_command(&ctx.http, commands::wonderful_command::register())
-                .await;
+        // let global_command =
+        //     Command::create_global_command(&ctx.http, commands::wonderful_command::register())
+        //         .await;
             
+        let global_commands = vec![
+            commands::wonderful_command::register(),
+            commands::modal::register(),
+            commands::welcome::register(),
+        ];
 
-        println!("I created the following global slash command: {global_command:#?}");
+        let mut created_globals = Vec::new();
+        for cmd in global_commands {
+            created_globals.push(Command::create_global_command(&ctx.http, cmd).await)
+        }
+
+        println!("I created the following global slash command: {created_globals:#?}");
     }
 }   
 
@@ -76,7 +85,7 @@ async fn main() {
     dotenv::dotenv().ok();
     // Login with a bot token from the environment
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-    // Set gateway intents, which decides what events the bot will be notified about
+    // Set gateway intents, which decides what events the bot will be notified about'c
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
