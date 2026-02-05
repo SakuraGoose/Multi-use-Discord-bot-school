@@ -10,6 +10,8 @@ Vi skulle lave en kort diagram, om hvordan vi forestiller os den endelige bot no
 
 Udover dette er vi blevet enige om at skifte til Python, efter Hjalte viste Ahed og Noah hvor simpelt det er i modsætning til Rust.
 
+Opsatte basics i Python
+
 ```mermaid
 graph TD
     A[Start] --> B[Process]
@@ -20,7 +22,18 @@ graph TD
 ```
 
 ## 2026/01/29
+Noah satte economy system op
 
+Ahed begyndte på black jack/parent class
+
+Hjalte syg
+
+## 2026/02/05
+Noah daily login
+
+Ahed coinflip
+
+Hjalte syg
 
 ---
 
