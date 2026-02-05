@@ -45,7 +45,7 @@ class SQLiteEco(EconomyRepo):
             async with aiosqlite.connect(self.db_path) as db:
                 await db.execute(
                     "INSERT OR IGNORE INTO users (user_id) VALUES (?)",
-                    (user_id),
+                    (user_id,)
                 )
                 await db.commit()
 
@@ -69,8 +69,8 @@ class SQLiteEco(EconomyRepo):
     async def get_bank(self, user_id: int) -> int:
         async with aiosqlite.connect(self.db_path) as db:
             async with db.execute(
-                "SELCET bank FROM users WHERE user_id = ?",
-                (user_id),
+                "SELECT bank FROM users WHERE user_id = ?",
+                (user_id,)
             ) as cur:
                 row = await cur.fetchone()
                 return row[0] if row else 0
@@ -82,3 +82,8 @@ class SQLiteEco(EconomyRepo):
                 (amount, user_id)
             )
             await db.commit()
+
+class EconomyRepoFactory:
+    @staticmethod
+    def create() -> EconomyRepo:
+        return SQLiteEco()

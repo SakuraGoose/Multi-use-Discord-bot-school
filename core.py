@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
-from database import init_db
+from database import init_db, EconomyRepoFactory
 
 load_dotenv()
 
@@ -14,6 +14,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+eco_repo = EconomyRepoFactory.create()
 
 @bot.event
 async def on_ready():
@@ -35,5 +36,35 @@ async def eight_ball(interaction: discord.Interaction, question: str):
 
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("Pong!")
+
+
+@bot.tree.command(name="balance", description="Check your balance")
+
+async def balance(interaction: discord.Interaction):
+    user_id = interaction.user.id
+
+    await eco_repo.ensure_user(user_id)
+
+    balance = await eco_repo.get_balance(user_id)
+
+    await interaction.response.send_message(
+        f"**Money in wallet:** ${balance}"
+    )
+
+@bot.tree.command(name="bank", description="Check your balance")
+
+async def bank(interaction: discord.Interaction):
+    user_id = interaction.user.id
+
+    await eco_repo.ensure_user(user_id)
+
+    bank = await eco_repo.get_bank(user_id)
+
+    await interaction.response.send_message(
+        f"**Account balance:** ${bank}"
+    )
+
+
+
 
 bot.run(Token)
