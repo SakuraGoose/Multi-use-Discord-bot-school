@@ -8,8 +8,7 @@ async def init_db():
         await db.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
-            balance INTEGER NOT NULL DEFAULT 0,
-            bank INTEGER NOT NULL DEFAULT 0
+            balance INTEGER NOT NULL DEFAULT 0
         )
         """)
         await db.commit()
@@ -28,11 +27,7 @@ class EconomyRepo(ABC):
         ...
 
     @abstractmethod
-    async def get_bank(self, user_id: int) -> int:
-        ...
-
-    @abstractmethod
-    async def add_bank(self, user_id: int, amount: int):
+    async def set_balance(self, user_id: int, amount: int):
         ...
 
 
@@ -45,7 +40,7 @@ class SQLiteEco(EconomyRepo):
             async with aiosqlite.connect(self.db_path) as db:
                 await db.execute(
                     "INSERT OR IGNORE INTO users (user_id) VALUES (?)",
-                    (user_id),
+                    (user_id,),
                 )
                 await db.commit()
 
@@ -66,19 +61,11 @@ class SQLiteEco(EconomyRepo):
             )
             await db.commit()
 
-    async def get_bank(self, user_id: int) -> int:
-        async with aiosqlite.connect(self.db_path) as db:
-            async with db.execute(
-                "SELCET bank FROM users WHERE user_id = ?",
-                (user_id),
-            ) as cur:
-                row = await cur.fetchone()
-                return row[0] if row else 0
-            
-    async def add_bank(self, user_id: int, amount: int):
+    async def set_balance(self, user_id: int, amount: int):
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
-                "UPDATE users SET bank = bank + ? WHERE user_id = ?",
-                (amount, user_id)
+                "INSERT INTO users (user_id, balance) VALUES (?, ?) "
+                "ON CONFLICT(user_id) DO UPDATE SET balance = ?",
+                (user_id, amount, amount)
             )
             await db.commit()
