@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
-from database import init_db, SQLiteEco
+from database import init_db, EconomyRepoFactory, SQLiteEco
 
 load_dotenv()
 
@@ -19,6 +19,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+eco_repo = EconomyRepoFactory.create()
 
 # --- (Start) Bot status and uptime variables built for the hosted version of the bot, via Sparked hosting. ---
 bot_status = {"online": False}
@@ -129,6 +130,7 @@ async def eight_ball(interaction: discord.Interaction, question: str):
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("Pong!")
 
+<<<<<<< HEAD
 class CoinflipView(discord.ui.View):
     def __init__(self, bet: int, user_id: int, economy_db, *, timeout: float = 60):
         super().__init__(timeout=timeout)
@@ -282,5 +284,36 @@ async def admin_balance(
             f"Set {user.display_name}'s balance to **{amount}**"
         )
 # --- TESTING ONLY (end) ---
+=======
+
+@bot.tree.command(name="balance", description="Check your balance")
+
+async def balance(interaction: discord.Interaction):
+    user_id = interaction.user.id
+
+    await eco_repo.ensure_user(user_id)
+
+    balance = await eco_repo.get_balance(user_id)
+
+    await interaction.response.send_message(
+        f"**Money in wallet:** ${balance}"
+    )
+
+@bot.tree.command(name="bank", description="Check your balance")
+
+async def bank(interaction: discord.Interaction):
+    user_id = interaction.user.id
+
+    await eco_repo.ensure_user(user_id)
+
+    bank = await eco_repo.get_bank(user_id)
+
+    await interaction.response.send_message(
+        f"**Account balance:** ${bank}"
+    )
+
+
+
+>>>>>>> Origin/Economy
 
 bot.run(Token)
