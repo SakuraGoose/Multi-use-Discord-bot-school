@@ -29,13 +29,21 @@ class EconomyRepo(ABC):
     @abstractmethod
     async def add_balance(self, user_id: int, amount: int):
         ...
+    
+    @abstractmethod
+    async def get_bank(self, user_id: int) -> int:
+        ...
+
+    @abstractmethod
+    async def add_bank(self, user_id: int, amount: int):
+        ...
 
     @abstractmethod
     async def set_balance(self, user_id: int, amount: int):
         ...
 
     @abstractmethod
-    async def claim_daily(self, user_id: int):
+    async def claim_daily(self, user_id: int) -> dict:
         ...
 
 
@@ -65,6 +73,9 @@ class SQLiteEco(EconomyRepo):
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
                 "UPDATE users SET balance = balance + ? WHERE user_id = ?",
+            )
+            await db.execute(
+                "UPDATE users SET bank = bank - ? WHERE user_id = ?",
                 (amount, user_id)
             )
             await db.commit()
@@ -81,9 +92,19 @@ class SQLiteEco(EconomyRepo):
     async def add_bank(self, user_id: int, amount: int):
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
-                "INSERT INTO users (user_id, balance) VALUES (?, ?) "
-                "ON CONFLICT(user_id) DO UPDATE SET balance = ?",
-                (user_id, amount, amount)
+                "UPDATE users SET bank = bank + ? WHERE user_id = ?",
+            )
+            await db.execute(
+                "UPDATE users SET balance = balance - ? WHERE user_id = ?",
+                (amount, user_id)
+            )
+            await db.commit()
+
+    async def set_balance(self, user_id: int, amount: int):
+        async with aiosqlite.connect(self.db_path) as db:
+            await db.execute(
+                "UPDATE users SET balance = ? WHERE user_id = ?",
+                (amount, user_id)
             )
             await db.commit()
 
@@ -111,12 +132,12 @@ class SQLiteEco(EconomyRepo):
             else:
                 return 1
             
-        def calc_reward(streak):
-            base_reward = 1000
+        def daily_reward(streak):
+            base_reward = 100
             if streak < 30:
-                return 1000 * 1.05511**(streak)
+                return int(100 * 1.05511**(streak))
             if streak >= 30:
-                return 5000
+                return 500
 
         async with aiosqlite.connect(self.db_path) as db:
             async with db.execute(
@@ -131,7 +152,24 @@ class SQLiteEco(EconomyRepo):
             else:
                 last_daily_str = None
                 current_streak = 0
+            
+            can_claim_result, time_diff = can_claim(last_daily_str)
 
+            if not can_claim_result:
+                return {"succes": False, "message": time_diff}
+
+            new_streak = calc_streak(time_diff, current_streak)
+            reward = daily_reward(new_streak)
+
+            now = datetime.now().isoformat()
+            await db.execute(
+                "UPDATE users SET balance = balance + ?, last_daily = ?, streak = ? WHERE user_id = ?",
+                (reward, now, new_streak, user_id)
+            )
+            await db.commit()
+
+            return {"success": True, "reward": reward, "streak": new_streak}
+            
 
 class EconomyRepoFactory:
     @staticmethod

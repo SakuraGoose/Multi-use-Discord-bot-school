@@ -99,7 +99,7 @@ async def on_ready():
     bot_status["online"] = True
     if not getattr(bot, "status_server_started", False):
         bot.loop.create_task(start_status_server())
-        bot.status_server_started = True
+        bot.Status_server_started = True
     await bot.tree.sync()
     await init_db()
     print(f"logged in as {bot.user}")
@@ -132,7 +132,6 @@ async def ping(interaction: discord.Interaction):
 
 
 @bot.tree.command(name="balance", description="Check your balance")
-
 async def balance(interaction: discord.Interaction):
     user_id = interaction.user.id
 
@@ -144,8 +143,13 @@ async def balance(interaction: discord.Interaction):
         f"**Money in wallet:** ${balance}"
     )
 
-@bot.tree.command(name="bank", description="Check your balance")
+# @bot.tree.command(name="atm", description="Withdraw or deposit money")
+# @app_commands.choices(action[
+#     app_commands.Choice(name="Withdraw", value="Withdraw"),
+#     app_commands.Choice(name="Deposit", value="Deposit")
+# ])
 
+@bot.tree.command(name="bank", description="Check your balance")
 async def bank(interaction: discord.Interaction):
     user_id = interaction.user.id
 
