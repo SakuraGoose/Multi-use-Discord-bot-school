@@ -3,12 +3,14 @@ import aiomysql
 async def init_db(pool):
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
-            await cur.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                user_id BIGINT PRIMARY KEY,
-                balance BIGINT NOT NULL DEFAULT 0
-            )
-            """)
+            await cur.execute("SHOW TABLES LIKE 'users'")
+            if await cur.fetchone() is None:
+                await cur.execute("""
+                CREATE TABLE users (
+                    user_id BIGINT PRIMARY KEY,
+                    balance BIGINT NOT NULL DEFAULT 0
+                )
+                """)
             await conn.commit()
 
 class EconomyDB:
@@ -19,7 +21,7 @@ class EconomyDB:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
-                    "INSERT IGNORE INTO users (user_id) VALUES (%s)",
+                    "INSERT INTO users (user_id) VALUES (%s) ON DUPLICATE KEY UPDATE user_id = user_id",
                     (user_id,)
                 )
                 await conn.commit()
@@ -52,3 +54,7 @@ class EconomyDB:
                     (user_id, amount, amount)
                 )
                 await conn.commit()
+
+    async def get_bank(self, user_id: int) -> int:
+        """Schema has no bank column; return 0 for /bank command compatibility."""
+        return 0

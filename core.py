@@ -1,3 +1,4 @@
+import asyncio
 import os
 import random
 import time
@@ -314,4 +315,6 @@ if __name__ == "__main__":
         bot.run(Token)
     finally:
         if mysql_pool:
-            bot.loop.run_until_complete(shutdown_cleanup())
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(shutdown_cleanup())
+            loop.close()
