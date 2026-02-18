@@ -1,5 +1,6 @@
+<h1 align="center">Hugo's Au Pair</h1>
 <p align="center">
-  <strong># Hugo's Au Pair</strong>
+  This project is a school project, for the purpose of Polymorphism. The bot is not made for production in mind, and will not be maintained.
 </p>
 
 <p align="center">
@@ -39,11 +40,22 @@
    ```bash
    pip install -r requirements.txt
    ```
-2. Create a `.env` file with your Discord bot token:
+
+2. Create a `.env` file with your Discord bot token and MySQL credentials:
    ```
    Discord_Bot_Token=your_token_here
+   
+   MYSQL_HOST=your_mysql_host
+   MYSQL_PORT=3306
+   MYSQL_USER=your_database_user
+   MYSQL_PASSWORD=your_database_password
+   MYSQL_DATABASE=your_database_name
    ```
+
 3. Run the bot:
    ```bash
    python core.py
    ```
+
+The bot will automatically connect to your MySQL database and create the necessary tables.
+
