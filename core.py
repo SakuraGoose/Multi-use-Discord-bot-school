@@ -3,13 +3,12 @@ import os
 import random
 import time
 
-import aiohttp
 from aiohttp import web
 import discord
 from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
-from database import init_db, EconomyDB
+from database import init_db, EconomyRepoFactory
 import aiomysql
 
 load_dotenv()
@@ -23,7 +22,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
-eco_repo = EconomyRepoFactory.create()
 
 # --- (Start) Bot status and uptime variables built for the hosted version of the bot, via Sparked hosting. ---
 bot_status = {"online": False}
@@ -118,7 +116,7 @@ async def on_ready():
             minsize=1,
             maxsize=10,
         )
-    economy_db = EconomyDB(mysql_pool)
+    economy_db = EconomyRepoFactory.create(mysql_pool)
     await init_db(mysql_pool)
     print("Connected to MySQL database")
     print(f"logged in as {bot.user}")

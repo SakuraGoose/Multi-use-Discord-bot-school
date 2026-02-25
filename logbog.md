@@ -14,11 +14,13 @@ Opsatte basics i Python
 
 ```mermaid
 graph TD
-    A[Start] --> B[Process]
-    B --> C{Decision}
-    C -->|Yes| D[End]
-    C -->|No| E[Alternative]
-    E --> D
+    A((Start)) --> B[Vælg kommando]
+    B --> C[[Kør kommando f.eks. gambling]]
+    C --> D{Vundet?}
+    D -->|Yes| E[[Tilføj penge til saldo]]
+    D -->|No| F[[Fratræk penge fra saldo]]
+    E -->G((Slut))
+    F -->G
 ```
 
 ## 2026/01/29
@@ -39,12 +41,16 @@ Hjalte syg
 
 ## 2026/02/17
 Ahed logic for black, samt test for gambling superclasset
-noah database setup for economy systemet
+
+Noah database setup for economy systemet
+
 hjalte status server for discord botten, updatede på noahs database setup og lavte en simpel coinfilp command
 ## 2026/02/18
 Ahed syg 
-noah ændrede på databasets kode, så det er mere effektivt og nemmere at bruge
-hjalte skiftede fra aiomysql til MySQL, updatede databasen også lavt en /bank komand og /adminballance til at kunne teste coin filp
+Noah ændrede på databasets kode, så det er mere effektivt og nemmere at bruge
+
+Hjalte skiftede fra aiomysql til MySQL, updatede databasen også lavt en /adminballance, for at teste coin filp kommandoen
+
 ## 2026/02/25 
 
 # Bruger Historie 1: Ping

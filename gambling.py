@@ -48,6 +48,7 @@ class Dice(Gambling):
         else:
             payout = self.lose()
             return f"🎲 You rolled a **{roll}**. You lost.", payout
+
 class BlackJack(Gambling): 
     def play(self):
         player_card = random.randint(1,11)
