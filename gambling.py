@@ -61,10 +61,7 @@ class BlackJack(Gambling):
     else:
         return int(card[0])
     
-    random.shuffle(deck)
-    player_card = [deck.pop(), deck.pop()]
-    dealer_card = [deck.pop(), deck.pop()]
-    
+
     def calculate_score(self, cards):
         score = sum(self.card_value(card) for card in cards)
         # Handle aces: if score > 21 and we have aces, count aces as 1
@@ -81,8 +78,9 @@ class BlackJack(Gambling):
         elif dealer_score == 21:
 
     def play(self):
-        player_card = random.randint(1,11)
-        dealer_card = random.randint(1,11)
+    random.shuffle(deck)
+    player_card = [deck.pop(), deck.pop()]
+    dealer_card = [deck.pop(), deck.pop()]
         if player_card > dealer_card:
             payout = self.win(2)
             return f"🃏 You got a **{player_card}** and the dealer got a **{dealer_card}**. You won! {payout}", payout
