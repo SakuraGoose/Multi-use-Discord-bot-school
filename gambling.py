@@ -76,11 +76,11 @@ class BlackJack(Gambling):
             payout = self.win(2.5)  # Blackjack pays 3:2
             return f"🃏 **Blackjack!** You got {player_card[0][0]} of {player_card[0][1]} and {player_card[1][0]} of {player_card[1][1]} (21). Dealer has {dealer_card[0][0]} of {dealer_card[0][1]} and {dealer_card[1][0]} of {dealer_card[1][1]} ({dealer_score}). You won {payout}!", payout
         elif dealer_score == 21:
-
-    def play(self):
     random.shuffle(deck)
     player_card = [deck.pop(), deck.pop()]
     dealer_card = [deck.pop(), deck.pop()]
+    def play(self):
+
         if player_card > dealer_card:
             payout = self.win(2)
             return f"🃏 You got a **{player_card}** and the dealer got a **{dealer_card}**. You won! {payout}", payout
