@@ -52,5 +52,5 @@ Noah ændrede på databasets kode, så det er mere effektivt og nemmere at bruge
 Hjalte skiftede fra aiomysql til MySQL, updatede databasen også lavt en /adminballance, for at teste coin filp kommandoen
 
 ## 2026/02/25 
-
+ahed lavede en fungerene black jack class som **burde** virke, mangler at teste det mangler dog at implemtere dette i core.py.
 # Bruger Historie 1: Ping
