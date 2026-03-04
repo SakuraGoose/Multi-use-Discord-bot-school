@@ -6,7 +6,9 @@ async def init_db(pool):
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
             await cur.execute("SHOW TABLES LIKE 'users'")
-            if await cur.fetchone() is None:
+            table_exists = await cur.fetchone() is not None
+
+            if not table_exists:
                 await cur.execute("""
                 CREATE TABLE users (
                     user_id BIGINT PRIMARY KEY,
@@ -16,6 +18,44 @@ async def init_db(pool):
                     streak INTEGER DEFAULT 1
                 )
                 """)
+            else:
+                # Check and add bank column if missing
+                await cur.execute("""
+                    SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE table_schema = DATABASE()
+                    AND table_name = 'users'
+                    AND column_name = 'bank'                 
+                """)
+                bank_exists = (await cur.fetchone())[0] > 0
+
+                if not bank_exists:
+                    await cur.execute("ALTER TABLE users ADD COLUMN bank BIGINT NOT NULL DEFAULT 0")
+
+                await cur.execute("""
+                    SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE table_schema = DATABASE()
+                    AND table_name = 'users'
+                    AND column_name = 'last_daily'                 
+                """)
+                last_daily_exists = (await cur.fetchone())[0] > 0
+
+                if not last_daily_exists:
+                    await cur.execute("ALTER TABLE users ADD COLUMN last_daily TEXT")
+
+                await cur.execute("""
+                    SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE table_schema = DATABASE()
+                    AND table_name = 'users'
+                    AND column_name = 'streak'                 
+                """)
+                streak_exists = (await cur.fetchone())[0] > 0
+
+                if not last_daily_exists:
+                    await cur.execute("ALTER TABLE users ADD COLUMN streak INTEGER DEFAULT 1")
+
             await conn.commit()
 
 class EconomyRepo(ABC):
