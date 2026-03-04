@@ -19,7 +19,7 @@ class Gambling(ABC):
         return -self.bet 
     
     @abstractmethod
-    def play(self):
+    def play(self) -> (result_text: str, payout:int):
         """Must return (result_text, payout)"""
         pass 
 

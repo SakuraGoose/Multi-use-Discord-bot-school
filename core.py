@@ -150,11 +150,76 @@ async def eight_ball(interaction: discord.Interaction, question: str):
     await interaction.response.send_message(f"**Question: ** {question} \n**Answer: ** {answer}"
     )
 
+
 @bot.tree.command(name="ping", description="Ping the bot")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("Pong!")
 
+@bot.tree.command(name="daily", description="Claim your daily reward")
+async def daily(interaction: discord.Interaction):
+    user_id = interaction.user.id
+    await economy_db.ensure_user(user_id)
+    result = await economy_db.claim_daily(user_id)
+    success = result["success"]
+    if success == False:
+        message = result["message"]
+        await interaction.response.send_message(message)
+        return
+
+    if success == True:
+        reward = result["reward"]
+        curr_streak = result["streak"]
+        await interaction.response.send_message(f"You claimed your daily reward of **{reward}$** \n Your streak is **{curr_streak}**")
+
+@bot.tree.command(name="cash", description="Check your cash balance")
+async def balance(interaction: discord.Interaction):
+    user_id = interaction.user.id
+    await economy_db.ensure_user(user_id)
+    cash = await economy_db.get_balance(user_id)
+    await interaction.response.send_message(f"You have a balance of **{cash}$** cash")
+
+@bot.tree.command(name="bank", description="Check your balance")
+async def bank(interaction: discord.Interaction):
+    user_id = interaction.user.id
+    await economy_db.ensure_user(user_id)
+    bank = await economy_db.get_bank(user_id)
+    await interaction.response.send_message(f"You have a balance of **{bank}$** in your bank")
+
+@bot.tree.command(name="deposit", description="Deposit cash into bank")
+async def deposit(interaction: discord.Interaction, amount: int):
+    user_id = interaction.user.id
+    await economy_db.ensure_user(user_id)
+
+    current_cash = await economy_db.get_balance(user_id)
+    if current_cash < amount:
+        message = f"You don't have **{amount}** in you wallet. \n The max you can deposit is **{current_cash}**"
+    elif current_cash >= amount:
+        await economy_db.add_bank(user_id, amount)
+        await economy_db.add_balance(user_id, -amount)
+        new_bank = await economy_db.get_bank(user_id)
+        new_cash = await economy_db.get_balance(user_id)
+        message = f"*Succesfully deposited* **{amount}** *to your bank account* \n Bank: **{new_bank}** \n Wallet: **{new_cash}**"
+    await interaction.response.send_message(message)
+
+@bot.tree.command(name="withdraw", description="Withdraw cash from bank")
+async def deposit(interaction: discord.Interaction, amount: int):
+    user_id = interaction.user.id
+    await economy_db.ensure_user(user_id)
+
+    current_bank = await economy_db.get_bank(user_id)
+    if current_cash < amount:
+        message = f"You don't have **{amount}** in your bank. \n The max you can withdraw is **{current_bank}**"
+    elif current_cash >= amount:
+        await economy_db.add_bank(user_id, -amount)
+        await economy_db.add_balance(user_id, amount)
+        new_bank = await economy_db.get_bank(user_id)
+        new_cash = await economy_db.get_balance(user_id)
+        message = f"*Succesfully withdrew* **{amount}** *from your bank account* \n Bank: **{new_bank}** \n Wallet: **{new_cash}**"
+    await interaction.response.send_message(message)
+
+
 class CoinflipView(discord.ui.View):
+
     def __init__(self, bet: int, user_id: int, economy_db, *, timeout: float = 60):
         super().__init__(timeout=timeout)
         self.bet = bet
