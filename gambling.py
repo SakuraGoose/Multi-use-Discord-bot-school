@@ -53,13 +53,13 @@ class BlackJack(Gambling):
     cards_list = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
     
     @staticmethod
-    def card_value(card):
-    if card[0] in ['Jack', 'Queen', 'King']:
-        return 10
-    elif card[0] == 'Ace':
-        return 11
-    else:
-        return int(card[0])
+    def card_value(card: list):
+        if card[0] in ['Jack', 'Queen', 'King']:
+            return 10
+        elif card[0] == 'Ace':
+            return 11
+        else:
+            return int(card[0])
     
 
     def calculate_score(self, cards):
@@ -69,13 +69,15 @@ class BlackJack(Gambling):
         while score > 21 and aces > 0:
             score -= 10  # Change ace from 11 to 1
             aces -= 1
-        return score
+            return score
         player_score = self.calculate_score(player_card)
         dealer_score = self.calculate_score(dealer_card)
         if player_score == 21 and dealer_score != 21:
             payout = self.win(2.5)  # Blackjack pays 3:2
             return f"🃏 **Blackjack!** You got {player_card[0][0]} of {player_card[0][1]} and {player_card[1][0]} of {player_card[1][1]} (21). Dealer has {dealer_card[0][0]} of {dealer_card[0][1]} and {dealer_card[1][0]} of {dealer_card[1][1]} ({dealer_score}). You won {payout}!", payout
         elif dealer_score == 21:
+            pass
+    
     random.shuffle(deck)
     player_card = [deck.pop(), deck.pop()]
     dealer_card = [deck.pop(), deck.pop()]
@@ -86,9 +88,9 @@ class BlackJack(Gambling):
             return f"🃏 You got a **{player_card}** and the dealer got a **{dealer_card}**. You won! {payout}", payout
         elif player_card == dealer_card:
             return f"🃏 You got a **{player_card}** and the dealer got a **{dealer_card}**. It's a tie! No win or loss.", 0
-        else:
+        elif: player_card < dealer_card
             payout = self.lose()
-            return f"🃏 Dealer got blackjack with {dealer_cards[0][0]} of {dealer_cards[0][1]} and {dealer_cards[1][0]} of {dealer_cards[1][1]}. You lost.", payout
+            return f"🃏 Dealer won with {dealer_cards[0][0]} of {dealer_cards[0][1]} and {dealer_cards[1][0]} of {dealer_cards[1][1]}. You lost.", payout
 
         while dealer_score < 17:
             new_card = deck.pop()
@@ -107,3 +109,6 @@ class BlackJack(Gambling):
             return f"🃏 Dealer wins! Your cards: {', '.join(f'{c[0]} of {c[1]}' for c in player_cards)} ({player_score}). Dealer: {', '.join(f'{c[0]} of {c[1]}' for c in dealer_cards)} ({dealer_score}). You lost.", payout
         else:
             return f"🃏 Push! Your cards: {', '.join(f'{c[0]} of {c[1]}' for c in player_cards)} ({player_score}). Dealer: {', '.join(f'{c[0]} of {c[1]}' for c in dealer_cards)} ({dealer_score}). It's a tie.", 0
+
+class GamblingFactory():
+    pass
