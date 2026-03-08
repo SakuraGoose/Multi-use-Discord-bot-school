@@ -52,6 +52,11 @@ class BlackJack(Gambling):
     card_categories = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
     cards_list = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
     
+    def __init__(self, user_id: int, bet: int):
+        super().__init__(user_id, bet)
+        self.deck = [(card, category) for card in self.cards_list for category in self.card_categories]
+        random.shuffle(self.deck)
+    
     @staticmethod
     def card_value(card: list):
         if card[0] in ['Jack', 'Queen', 'King']:
@@ -69,12 +74,20 @@ class BlackJack(Gambling):
         while score > 21 and aces > 0:
             score -= 10  # Change ace from 11 to 1
             aces -= 1
-            return score
-        player_score = self.calculate_score(player_card)
-        dealer_score = self.calculate_score(dealer_card)
+        return score
+    
+    def play(self):
+        # Deal initial cards
+        player_cards = [self.deck.pop(), self.deck.pop()]
+        dealer_cards = [self.deck.pop(), self.deck.pop()]
+        
+        player_score = self.calculate_score(player_cards)
+        dealer_score = self.calculate_score(dealer_cards)
+        
+        # Check for blackjack
         if player_score == 21 and dealer_score != 21:
             payout = self.win(2.5)  # Blackjack pays 3:2
-            return f"🃏 **Blackjack!** You got {player_card[0][0]} of {player_card[0][1]} and {player_card[1][0]} of {player_card[1][1]} (21). Dealer has {dealer_card[0][0]} of {dealer_card[0][1]} and {dealer_card[1][0]} of {dealer_card[1][1]} ({dealer_score}). You won {payout}!", payout
+            return f"🃏 **Blackjack!** You got {player_cards[0][0]} of {player_cards[0][1]} and {player_cards[1][0]} of {player_cards[1][1]} (21). Dealer has {dealer_cards[0][0]} of {dealer_cards[0][1]} and {dealer_cards[1][0]} of {dealer_cards[1][1]} ({dealer_score}). You won {payout}!", payout
         elif dealer_score == 21:
             pass
     
@@ -93,7 +106,7 @@ class BlackJack(Gambling):
             return f"🃏 Dealer won with {dealer_cards[0][0]} of {dealer_cards[0][1]} and {dealer_cards[1][0]} of {dealer_cards[1][1]}. You lost.", payout
 
         while dealer_score < 17:
-            new_card = deck.pop()
+            new_card = self.deck.pop()
             dealer_cards.append(new_card)
             dealer_score = self.calculate_score(dealer_cards)
         
