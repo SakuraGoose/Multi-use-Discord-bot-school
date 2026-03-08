@@ -52,16 +52,20 @@ class BlackJack(Gambling):
     card_categories = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
     cards_list = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
     
+    def __init__(self, user_id: int, bet: int):
+        super().__init__(user_id, bet)
+        self.deck = [(card, category) for card in self.cards_list for category in self.card_categories]
+        random.shuffle(self.deck)
+    
     @staticmethod
     def card_value(card):
-    if card[0] in ['Jack', 'Queen', 'King']:
-        return 10
-    elif card[0] == 'Ace':
-        return 11
-    else:
-        return int(card[0])
+        if card[0] in ['Jack', 'Queen', 'King']:
+            return 10
+        elif card[0] == 'Ace':
+            return 11
+        else:
+            return int(card[0])
     
-
     def calculate_score(self, cards):
         score = sum(self.card_value(card) for card in cards)
         # Handle aces: if score > 21 and we have aces, count aces as 1
@@ -70,28 +74,26 @@ class BlackJack(Gambling):
             score -= 10  # Change ace from 11 to 1
             aces -= 1
         return score
-        player_score = self.calculate_score(player_card)
-        dealer_score = self.calculate_score(dealer_card)
+    
+    def play(self):
+        # Deal initial cards
+        player_cards = [self.deck.pop(), self.deck.pop()]
+        dealer_cards = [self.deck.pop(), self.deck.pop()]
+        
+        player_score = self.calculate_score(player_cards)
+        dealer_score = self.calculate_score(dealer_cards)
+        
+        # Check for blackjack
         if player_score == 21 and dealer_score != 21:
             payout = self.win(2.5)  # Blackjack pays 3:2
-            return f"🃏 **Blackjack!** You got {player_card[0][0]} of {player_card[0][1]} and {player_card[1][0]} of {player_card[1][1]} (21). Dealer has {dealer_card[0][0]} of {dealer_card[0][1]} and {dealer_card[1][0]} of {dealer_card[1][1]} ({dealer_score}). You won {payout}!", payout
+            return f"🃏 **Blackjack!** You got {player_cards[0][0]} of {player_cards[0][1]} and {player_cards[1][0]} of {player_cards[1][1]} (21). Dealer has {dealer_cards[0][0]} of {dealer_cards[0][1]} and {dealer_cards[1][0]} of {dealer_cards[1][1]} ({dealer_score}). You won {payout}!", payout
         elif dealer_score == 21:
-    random.shuffle(deck)
-    player_card = [deck.pop(), deck.pop()]
-    dealer_card = [deck.pop(), deck.pop()]
-    def play(self):
-
-        if player_card > dealer_card:
-            payout = self.win(2)
-            return f"🃏 You got a **{player_card}** and the dealer got a **{dealer_card}**. You won! {payout}", payout
-        elif player_card == dealer_card:
-            return f"🃏 You got a **{player_card}** and the dealer got a **{dealer_card}**. It's a tie! No win or loss.", 0
-        else:
             payout = self.lose()
             return f"🃏 Dealer got blackjack with {dealer_cards[0][0]} of {dealer_cards[0][1]} and {dealer_cards[1][0]} of {dealer_cards[1][1]}. You lost.", payout
-
+        
+        # Dealer hits until 17 or higher
         while dealer_score < 17:
-            new_card = deck.pop()
+            new_card = self.deck.pop()
             dealer_cards.append(new_card)
             dealer_score = self.calculate_score(dealer_cards)
         
