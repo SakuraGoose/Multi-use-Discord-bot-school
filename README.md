@@ -4,11 +4,6 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/endpoint?url=https://shieldsio.sparked.network/badge" alt="Bot status">
-  <img src="https://img.shields.io/endpoint?url=https://shieldsio.sparked.network/uptime&cacheSeconds=60" alt="Bot uptime">
-</p>
-
-<p align="center">
   A multi-use Discord bot with economy, games, and fun commands.
 </p>
 
